@@ -1,8 +1,53 @@
-@startuml
-Title Data Flow Diagram - Security Tool
+@startuml Security Tool DFD Level 0
 
-Actor User
-User -> Scanner : Trigger Scan
-Scanner -> Trivy : Scan Image
-Trivy -> Dashboard : Send Metrics
+!define RECTANGLE class
+
+rectangle "User / Developer" as User
+rectangle "go-security-tool CLI / Web UI" as Tool
+rectangle "Trivy Scanner" as Trivy
+rectangle "OWASP ZAP" as ZAP
+rectangle "Falco Runtime" as Falco
+rectangle "Grafana + Prometheus + Loki" as Dashboard
+rectangle "Kubernetes Cluster" as K8s
+
+User --> Tool : Trigger scan / view dashboard
+Tool --> Trivy : Scan images / K8s / FS
+Tool --> ZAP : DAST on services
+Trivy --> Dashboard : Metrics (Prometheus)
+ZAP --> Dashboard : Reports
+Falco --> K8s : eBPF monitoring
+K8s --> Falco : Events
+Falco --> Dashboard : Alerts (Loki)
+Dashboard --> User : Visualizations & Alerts
+
+@enduml
+
+@startuml Security Tool DFD Level 1 - Threat Boundaries
+
+rectangle "External Zone" {
+  User
+}
+
+rectangle "Tool Boundary" {
+  Tool
+  Trivy
+  ZAP
+}
+
+rectangle "Runtime Boundary" {
+  Falco
+  K8s
+}
+
+rectangle "Observability Boundary" {
+  Dashboard
+}
+
+User --> Tool
+Tool --> Trivy
+Tool --> ZAP
+Trivy --> Dashboard
+Falco --> Dashboard
+K8s --> Falco
+
 @enduml
