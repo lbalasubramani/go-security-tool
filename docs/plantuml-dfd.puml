@@ -1,0 +1,8 @@
+@startuml
+Title Data Flow Diagram - Security Tool
+
+Actor User
+User -> Scanner : Trigger Scan
+Scanner -> Trivy : Scan Image
+Trivy -> Dashboard : Send Metrics
+@enduml
